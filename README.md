@@ -3,8 +3,8 @@
 Ansible's documentation defines patterns for idempotently creating and maintaining specified numbers of hosts on 
 IAAS providers such as AWS and Rackspace using attributes or tags to maintain desired counts for each type
  of host (specifically - the pattern of running a cloud module as a 'local_action:' and then iterating with 
- 'add_host:' to get the cloud hosts into live inventory). However, it was the author(s) finding that the next place 
- the admin will find themselves is with a playbook for each type of service they deploy that has these host tags
+ 'add_host:' to get the cloud hosts into live inventory). However, it was "our" (the author[s]) finding that the next 
+ place the admin will find themselves is with a playbook for each type of service they deploy that has these host tags
  and counts statically written in. Further, if some instances of a service are on different providers or need to 
  run different numbers of each type of host, the playbook for that specific service will then also have multiple
  versions.
@@ -37,3 +37,15 @@ instance of a service, and any variables specific to that service.
   - host vars specific to the component are passed along by add_host.
 - The play that calls the cloud module as a 'local_action:' repeats once for each alias of localhost using the 
 host vars to define the options to be used by the cloud module.
+
+pansi is currently part of a production deployment and includes some interesting features like replacing the 
+default administrative user in the IAAS provider's disk image and switching to the new user both within a single run
+of ansible-playbook, as well as deploying services divided arbitrarily across multiple IAAS providers (because of 
+how the Ansible's cloud modules are run, a role is written for each IAAS provider as a shim but they are all 
+functionally very similar to one another. EC2, Rackspace, and private OpenStack [the older nova compute module] 
+are implemented thus far).
+
+Most if not all of this functionality will be added to this repo as portions of the existing implementation 
+are cleaned up and made less specific to the current use case, with a timeline that is likely to be denominated in 
+number of months (but the timeframe to a coherent, easily adoptable set of resources may well stretch longer ).
+
