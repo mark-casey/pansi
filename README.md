@@ -18,8 +18,8 @@ With the above in mind, the goal of pansi is to document a pattern by which a se
 Ansible variables file and passed (by the playbook for the service being deployed) to a set of IAAS-specific roles 
 that will do the actual work with Ansible's cloud modules. Or in other words it is an abstraction designed to 
  separate the playbooks that create and deploy the service from the variables that distinguish it from other services 
- of the same type. Under this approach, all instances of a service can be deployed and maintained by a single 
- playbook.
+ of the same type. Under this approach, a service only needs one playbook to deploy and maintain all instances of 
+ itself.
 
 ### What is the downside to this approach?
 
