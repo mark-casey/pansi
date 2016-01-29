@@ -1,0 +1,124 @@
+---
+
+#
+# The README currently doesn't get into any of the terms or concepts that are currently
+# pansi-specific things (it only mentions that a goal is to simplify/reduce them).
+#
+# A lot of this info will move to the README.
+#
+# This is partly re-explained below... but a lot of the pansi-specific terms and concepts are intentionally
+# misspelled, which is a practice that helps with the continued manageability of infrastructure-as-code and
+# infrastructure-as-data projects. (i.e.: the first term is 'servis' instead of 'service', so that if the
+# time comes to change it to something else, there aren't 219,241 results in the find-replace to sort through!)
+#
+#
+#
+# Definitions:
+#
+# The term 'servis' is roughly synonymous to terms like 'site', 'service', or 'deployment',
+#   but the word and parameter names derived from it (ex.: servisParams) are more easily
+#   located and distinguished in code bases, which will often use these more common
+#   terms in many different contexts. A servis is a server (or servers working together)
+#   to do an assigned job such as run builds, host a package cache, store backups, or etc.
+#
+# The servis represented by "serviceName" is an instance of its given "servisType", just
+#   as a traditional programming object is an instance of its declaration.
+#
+# #FIXME: define servisParams (it's a file like this one!)
+#
+# #FIXME: may want to change node to be host (host in the Ansible sense of the word)
+# A servis consists of nodes; each node is a host/instance/VM. The nodes are placed into
+#   groups in Ansible's inventory based on a list of groups defined in the servisParams,
+#   and Ansible plays and roles are run on the nodes depending on their group membership.
+#
+# Nodes are provided by... "providers". These are Infrastructure as a Service (IAAS)
+#   providers such as EC2, Rackspace, and etc. Providers' names look like 'awapne2' or
+#   'raxord2', and (in this context) are actually a reference to an individual
+#   tennant/project/VPC-subnet within an IAAS provider (as opposed to the entire
+#   IAAS company, or everything a you host there... which would be too broad).
+#
+# A node's "typeLabel" is its primary group. The ficticious servis this file describes
+#   ('testar') is primarily tasked with running Jenkins, but it also hosts LDAP. So the
+#   typeLabel is 'jenkins', and the one "additional_group" defined is 'ldap'. Aside from
+#   providing a portion of the node's name in IAAS providers, distinguishing one group as the
+#   typeLabel is merely intended as a convenience for us humans. (testar is an instance of the
+#   ficticious servisType 'skylab', a name which could reflect the logistical/oversight
+#   aspects of the work it does.)
+#
+#   The deploy order is determined by the playbook for the servisType and does not
+#   depend on which group is the typeLabel. The playbook deploying a skylab servis needs
+#   LDAP running before Jenkins can use it for auth, so the group and plays for LDAP in
+#   the skylab playbook are actually processed first in spite of LDAP not being those
+#   node's typeLabel.
+#
+#   However, changing the typeLabel to a different group (whether to an added group or
+#   swapping it out with one of its existing additional_groups) requires redeploying the
+#   servis, or you'll end up with twice the intended nodes (one set with the new typeLabel,
+#   and one orphaned set set with the old one *which may still be serving requests*).
+#
+
+servisParams:
+
+  # name of servis
+  servisName: testar
+
+  # skylab is the internal name for the type of servis that runs builds, hosts an apt cache, and etc.
+  servisType: skylab
+
+  # this skylab is a crossSyncedPair, which sync results of new builds to one another
+  #   - a servis with only one variant may not need a value for servisVariant
+  #   - it is legal to use servisVariant when there is only one variant (perhaps more are expected)
+  servisVariant: crossSyncedPair
+
+  # the key to tell the IAAS provider to use when creating the instance, and to then use to get into it
+  sshKeyName: fabrikamdeploy
+
+  # variables that this servisType (skylab), will expect
+  #   - these are used by Ansible roles that configure services, not by the roles that install the software
+  #   - it is bad to use the variables inside shared roles that install software
+  servisVars:
+    skylabFullName: testar.fabrikam.com
+    skylabHost: testar
+    skylabDomain: fabrikam.com
+    skylabMakesBackups: True
+
+  # the user we will create when removing the default admin user for security
+  deployUser: fabrikamdeploy
+
+  # a YAML structure that describes the nodes in this servis
+  nodes:
+    - typeLabel: jenkins
+      provider: awapne2
+      count: 1
+      additional_groups:
+        - ldap
+    - typeLabel: jenkins
+      provider: raxord2
+      count: 1
+      additional_groups:
+        - ldap
+    - typeLabel: aptly
+      provider: awapne2
+      count: 1
+    - typeLabel: aptly
+      provider: raxord2
+      count: 1
+
+
+
+
+
+#WORK-IN-PROGRESS BELOW HERE
+      ##
+      ## ADDITIONAL FUTURE ATTRIBUTES OF NODES
+      ##
+      ## These are node attributes that were previously defined elsewhere or used their defaults.
+      ## Either a block like this will get added directly to each defined node, or they may move
+      ## into group_vars/all and be defined as "option sets", so that each node can define an
+      ## option set.
+      #imageParams:
+      #  image: ubuntu-trusty-lts
+      #  instanceInitialUser: ubuntu
+      #instanceSize: medium
+      #rootVolSize: 100
+
