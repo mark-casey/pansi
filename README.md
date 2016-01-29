@@ -46,7 +46,7 @@ letters from the phrase "PAAS in Ansible" run together.
 
 **NOTE**: Many of these terms are intentionally misspelled. The purpose of this is to help
  maintain manageability. For example, the first term below 'servis' is merely a misspelling
- of 'service'. The misspelled option is more easily located and distinguished in code bases,
+ of 'service'. The misspelled option is more easily located and distinguished in codebases,
  which often use these common terms in many different contexts. Should a term ever need to
  be renamed or modified procedurally, the find/replace or other operation will be much
  easier on the human running it and there may be 100 instances of the misspelled term to
