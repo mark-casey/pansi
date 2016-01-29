@@ -1,32 +1,37 @@
 ---
 
 #
-# The README currently doesn't get into any of the terms or concepts that are currently
-# pansi-specific things (it only mentions that a goal is to simplify/reduce them).
+# The README currently doesn't get into any of the terms or concepts that are
+# pansi-specific (it just mentions that a goal is to simplify and remove
+# project-specific things where possible, to reduce overhead).
 #
 # A lot of this info will move to the README.
-#
-# This is partly re-explained below... but a lot of the pansi-specific terms and concepts are intentionally
-# misspelled, which is a practice that helps with the continued manageability of infrastructure-as-code and
-# infrastructure-as-data projects. (i.e.: the first term is 'servis' instead of 'service', so that if the
-# time comes to change it to something else, there aren't 219,241 results in the find-replace to sort through!)
 #
 #
 #
 # Definitions:
 #
-# The term 'servis' is roughly synonymous to terms like 'site', 'service', or 'deployment',
-#   but the word and parameter names derived from it (ex.: servisParams) are more easily
-#   located and distinguished in code bases, which will often use these more common
-#   terms in many different contexts. A servis is a server (or servers working together)
-#   to do an assigned job such as run builds, host a package cache, store backups, or etc.
+# NOTE: Many of these terms are intentionally misspelled. The purpose of this is to help 
+# maintain manageability. For example, the first term below 'servis' is merely a misspelling
+# of 'service'. The misspelled option is more easily located and distinguished in code bases,
+# which often use these common terms in many different contexts. Should a term ever need to
+# be renamed or modified procedurally, the find/replace or other operation will be much 
+# easier on the human running it and there may be 100 instances of the misspelled term to 
+# sort through instead of (in some cases) thousands of unrelated instances in the case of
+# using a generic term spelled correctly.
 #
-# The servis represented by "serviceName" is an instance of its given "servisType", just
-#   as a traditional programming object is an instance of its declaration.
 #
-# #FIXME: define servisParams (it's a file like this one!)
+# servis: Roughly synonymous to terms like 'service', or 'deployment'. A servis is a 
+#   server (or servers working together) to do an assigned job such as run builds, host a 
+#   package cache, store backups, or etc.
 #
-# #FIXME: may want to change node to be host (host in the Ansible sense of the word)
+# servisParams: A data-structure of parameters that define a servis, which takes the form of 
+#   an Ansible group_vars file named for the servis.
+#
+# servisName: The servis represented by "serviceName" is an instance of its given 
+#   "servisType", just as a traditional programming object is an instance of its declaration.
+#
+#
 # A servis consists of nodes; each node is a host/instance/VM. The nodes are placed into
 #   groups in Ansible's inventory based on a list of groups defined in the servisParams,
 #   and Ansible plays and roles are run on the nodes depending on their group membership.
