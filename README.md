@@ -91,7 +91,7 @@ letters from the phrase "PAAS in Ansible" run together.
  So the typeLabel is 'jenkins', and the one "additional_group" defined is 'ldap'. Aside
  from providing a portion of the node's name in IAAS providers, distinguishing one group
  as the typeLabel is merely intended as a convenience for us humans. (testar is an instance
- of the ficticious servisType 'skylab', a name which could reflect the logistical/oversight
+ of the fictitious servisType 'skylab', a name which could reflect the logistical/oversight
  aspects of the work it does.)
 
  The deploy order is determined by the playbook for the servisType and does not
