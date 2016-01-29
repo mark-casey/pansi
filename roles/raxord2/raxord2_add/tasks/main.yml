@@ -1,0 +1,90 @@
+---
+
+- name: Set up a new host instance on Rackspace
+  local_action:
+    module: rax
+    credentials: "~/.raxord2_credentials"
+    name: "raxord2-{{ servis + '-' + type }}"
+    flavor: "{{ flavor }}"
+    group: "{{ type }}"
+    image: "{{ image }}"
+    #boot_from_volume: yes
+    #boot_volume_size: 250
+    #boot_volume_terminate: yes
+    region: "{{ region }}"
+    #disk_config: "{{ disk_config }}"
+    wait: "{{ wait }}"
+    wait_timeout: 600
+    state: present
+    key_name: "{{ key_name }}"
+    count: "{{ count }}"
+    exact_count: yes
+  register: raxord2
+
+#
+# CAUTION!
+# The value used for name= or hostname= in the add_hosts tasks below must either be unique (such as the public
+#   IP) or include the provider name to prevent duplicate hostnames between providers (i.e.: two qasite-webhost3
+#   nodes, in different providers). Some providers embed their name in the instance's name when creating it and
+#   this stays with the value when used as the hostname in add_host tasks, others prepend it to the hostname
+#   field in every add_host task.
+#
+
+- name: Add instance(s) to group named for this servis
+  local_action: add_host hostname={{ item.rax_name }} ansible_ssh_host={{ item.rax_accessipv4 }} groupname={{ servis }}
+                nodeType={{ type }}
+                private_ip={{ item.rax_addresses.private[0].addr }}
+                public_ip={{ item.rax_accessipv4 }}
+                provider="raxord2"
+                instanceInitialUser={{ instanceInitialUser }}
+  with_items: raxord2.instances
+  when: wait == "yes"
+
+- name: Add instance(s) to group named for provider
+  local_action: add_host hostname={{ item.rax_name }} ansible_ssh_host={{ item.rax_accessipv4 }} groupname=raxord2
+  with_items: raxord2.instances
+  when: wait == "yes"
+
+- name: Add instance(s) to group representing type of host
+  local_action: add_host hostname={{ item.rax_name }} ansible_ssh_host={{ item.rax_accessipv4 }} groupname={{ type }}
+  with_items: raxord2.instances
+  when: wait == "yes"
+
+- name: Add instance(s) to combo servis_type group, such as prod3_dbnode, or prod4_webnode
+  local_action: add_host hostname={{ item.rax_name }} ansible_ssh_host={{ item.rax_accessipv4 }} groupname="{{ servis }}_{{ type }}"
+  with_items: raxord2.instances
+  when: wait == "yes"
+
+- name: Add instance(s) to group representing type of host
+  local_action: add_host hostname={{ item[0].rax_name }} ansible_ssh_host={{ item[0].rax_accessipv4 }} groupname={{ item[1] }}
+  with_nested:
+    - raxord2.instances
+    - additional_groups
+  when: wait == "yes"
+
+- name: Add instance(s) to combo servis_type group, such as prod3_dbnode, or prod4_webnode
+  local_action: add_host hostname={{ item[0].rax_name }} ansible_ssh_host={{ item[0].rax_accessipv4 }} groupname="{{ servis }}_{{ item[1] }}"
+  with_nested:
+    - raxord2.instances
+    - additional_groups
+  when: wait == "yes"
+
+- name: Wait for SSH to come up on instances
+  local_action: wait_for port=22 host={{ item.rax_accessipv4 }} timeout=600
+  with_items: raxord2.instances
+  when: wait == "yes"
+
+- name: Attempt SSH as instanceInitialUser - FAILS if user customization already done
+  shell: "ssh -o StrictHostKeyChecking=no -i ../ssh/{{ key_name }} {{ instanceInitialUser }}@{{ item.rax_accessipv4 }} 'exit'"
+  with_items: raxord2.instances
+  when: wait == "yes"
+  ignore_errors: yes
+  register: ssh_attempt
+
+- name: Add instance(s) still requiring user customization to 'host_users_customized_False' group
+  local_action: add_host hostname={{ item.item.rax_name }} ansible_ssh_host={{ item.item.rax_accessipv4 }} groupname="host_users_customized_False"
+  with_items: ssh_attempt.results
+  when: wait == "yes" and item.rc == 0
+
+
+#- debug: var=group_names

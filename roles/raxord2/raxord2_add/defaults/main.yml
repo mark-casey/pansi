@@ -1,0 +1,8 @@
+---
+
+flavor: "performance2-15"
+image: "image-guid-here"
+region: "ORD"
+key_name: "{{ sshKeyName }}"
+instanceInitialUser: root
+
