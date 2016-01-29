@@ -27,7 +27,7 @@ A small portion of the overhead that would have gone into maintaining a playbook
  redirected into maintaining the variable files that hold the service parameters. However, this is still much less 
  overhead than the alternative because many tasks like moving portions of a service (or entire services) to another 
  provider become a matter of changing a few parameters instead of rewriting portions of the playbook.
-#FIXME: reinforce; find a more compelling way to demonstrate this point ^^
+ #FIXME: reinforce; find a more compelling way to demonstrate this point ^^
 
 One important point is that this overhead is **NOT** the same as the overhead one would incur by trying to maintain a 
 standard static inventory file, a custom static inventory file that generates a standard static inventory file, 
