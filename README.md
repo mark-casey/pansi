@@ -128,9 +128,8 @@ instance of a service, and any variables specific to that service.
 - The name of the service to be deployed is passed on the ansible-playbook command line (-e).
 - A localhost play imports the group_vars file using the service name passed on the command line.
 - 'add_host:' is used to create an alias of localhost for each combination of: 'IAAS_provider:typeLabel'.
-  - host vars specific to the component are passed along by add_host.
-- The play that calls the cloud module as a 'local_action:' repeats once for each alias of localhost using the 
-host vars to define the options to be used by the cloud module.
+  - host vars that will be used by provider roles are passed along in the add_host task.
+- The play calls the provider role(s) once for each alias of localhost.
 
 pansi is currently part of a production deployment and includes some interesting features like replacing the 
 default administrative user in the IAAS provider's disk image and switching to the new user both within a single run
