@@ -42,8 +42,7 @@ the 'cattle' side of the traditional pets v. cattle analogy.
 Deploying named instances of services onto providers is kind of PAAS-like; pansi is a run-together assortment of 
 letters from the phrase "PAAS in Ansible".
 
-### Is there any other important information about pansi that maybe hasn't been well formatted yet that you could just 
-sort of paste-vomit into this space for me to read?
+### Is there any other important information about pansi that maybe hasn't been well formatted yet that you could just sort of paste-vomit into this space for me to read?
 
 These are kind of the values of the project:
 
