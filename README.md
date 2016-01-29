@@ -1,5 +1,7 @@
 # pansi
 
+### What problem does pansi attempt to solve?
+
 Ansible's documentation defines patterns for idempotently creating and maintaining specified numbers of hosts on 
 IAAS providers such as AWS and Rackspace using attributes or tags to maintain desired counts for each type
  of host (specifically - the pattern of running a cloud module as a 'local_action:' and then iterating with 
@@ -7,17 +9,43 @@ IAAS providers such as AWS and Rackspace using attributes or tags to maintain de
  place the admin will find themselves is with a playbook for each type of service they deploy that has these host tags
  and counts statically written in. Further, if some instances of a service are on different providers or need to 
  run different numbers of each type of host, the playbook for that specific service will then also have multiple
- versions.
+ versions. Playbook upkeep and task duplication under this approach can become an issue even with a relatively small 
+ number of services deployed.
 
-With this in mind the goal of pansi is to document a pattern by which a set of roles and plays can receive parameters 
-of what to create on an IAAS provider **without** requiring that static inventory files exist and be kept up once 
-the created hosts have been bootstrapped. It is an abstraction designed to store what a service would look like if 
-you were to redeploy it from scratch, and to then hand over maintenance of inventory to Ansible's dynamic inventory 
-scripts. This is important for the purpose of staying on the 'cattle' side of the traditional pets v. cattle analogy.
+### How does pansi help with this problem?
 
-In this way the author(s) see the project as a PAAS-like thing for Ansible, or pansi.
+With the above in mind, the goal of pansi is to document a pattern by which a service's parameters can be stored in an 
+Ansible variables file and passed (by the playbook for the service being deployed) to a set of IAAS-specific roles 
+that will do the actual work with Ansible's cloud modules. Or in other words it is an abstraction designed to 
+ separate the playbooks that create and deploy the service from the variables that distinguish it from other services 
+ of the same type. Under this approach, all instances of a service can be deployed and maintained by a single 
+ playbook.
 
-These ideals are important to the project:
+### What is the downside to this approach?
+
+A small portion of the overhead that would have gone into maintaining a playbook for each instance of a service is 
+ redirected into maintaining the variable files that hold the service parameters. However, this is still much less 
+ overhead than the alternative because many tasks like moving portions of a service (or entire services) to another 
+ provider become a matter of changing a few parameters instead of rewriting portions of the playbook.
+#FIXME: reinforce; find a more compelling way to demonstrate this point ^^
+
+One important point is that this overhead is **NOT** the same as the overhead one would incur by trying to maintain a 
+standard static inventory file, a custom static inventory file that generates a standard static inventory file, 
+trying to keep any static inventory file in sync with dynamic inventory scripts, or trying various other solutions. 
+The distinction lies in that pansi stores what types of nodes a service requires, how many there are of each type, 
+and what service-specific variables there might be, but knows next to nothing about any individual host (thereby 
+leaving that job to dynamic inventory scripts). This is a critical distinction for the purposes of staying on 
+the 'cattle' side of the traditional pets v. cattle analogy.
+
+### What does the name mean?
+
+Deploying named instances of services onto providers is kind of PAAS-like; pansi is a run-together assortment of 
+letters from the phrase "PAAS in Ansible".
+
+### Is there any other important information about pansi that maybe hasn't been well formatted yet that you could just 
+sort of paste-vomit into this space for me to read?
+
+These are kind of the values of the project:
 
 - New concepts and terms should be avoided wherever possible in favor of recycling existing Ansible (or general 
 "cloud-ops") concepts and terminology.
@@ -27,7 +55,7 @@ like current established patterns is of utmost importance.
 - The roadmap should always include discussion of options for further removing concepts, terms, and anti-patterns 
 that are pansi-specific.
 
-The current model in brief:
+This is the current model in brief (and probably with technical omissions or misstatements):
 
 - group_vars files that are understood to be used solely for pansi are created with a structure that defines an 
 instance of a service, and any variables specific to that service.
