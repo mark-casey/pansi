@@ -1,34 +1,29 @@
 ---
 
 #
-# The README currently doesn't get into any of the terms or concepts that are
-# pansi-specific (it just mentions that a goal is to simplify and remove
-# project-specific things where possible, to reduce overhead).
 #
-# A lot of this info will move to the README.
-#
-#
+# Basically all of this info will become part of the README.
 #
 # Definitions:
 #
-# NOTE: Many of these terms are intentionally misspelled. The purpose of this is to help 
+# NOTE: Many of these terms are intentionally misspelled. The purpose of this is to help
 # maintain manageability. For example, the first term below 'servis' is merely a misspelling
 # of 'service'. The misspelled option is more easily located and distinguished in code bases,
 # which often use these common terms in many different contexts. Should a term ever need to
-# be renamed or modified procedurally, the find/replace or other operation will be much 
-# easier on the human running it and there may be 100 instances of the misspelled term to 
+# be renamed or modified procedurally, the find/replace or other operation will be much
+# easier on the human running it and there may be 100 instances of the misspelled term to
 # sort through instead of (in some cases) thousands of unrelated instances in the case of
 # using a generic term spelled correctly.
 #
 #
-# servis: Roughly synonymous to terms like 'service', or 'deployment'. A servis is a 
-#   server (or servers working together) to do an assigned job such as run builds, host a 
+# servis: Roughly synonymous to terms like 'service', or 'deployment'. A servis is a
+#   server (or servers working together) to do an assigned job such as run builds, host a
 #   package cache, store backups, or etc.
 #
-# servisParams: A data-structure of parameters that define a servis, which takes the form of 
+# servisParams: A data-structure of parameters that define a servis, which takes the form of
 #   an Ansible group_vars file named for the servis.
 #
-# servisName: The servis represented by "serviceName" is an instance of its given 
+# servisName: The servis represented by "serviceName" is an instance of its given
 #   "servisType", just as a traditional programming object is an instance of its declaration.
 #
 #
