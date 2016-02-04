@@ -1,25 +1,18 @@
 # pansi
 
-### What problem does pansi attempt to solve?
+### What problems does pansi target, and in what ways?
 
-Ansible's documentation defines patterns for idempotently creating and maintaining specified numbers of hosts on 
-IAAS providers such as AWS and Rackspace using attributes or tags to maintain desired counts for each type
- of host (specifically: the pattern of running a cloud module as a 'local_action:' and then iterating with 
- 'add_host:' to get the cloud hosts into live inventory). However, it was "our" (the author[s]) finding that the next 
- place the admin will find themselves is with a playbook for each type of service they deploy that has these host tags
- and counts statically written in. Further, if some instances of a service are on different providers or need to 
- run different numbers of each type of host, the playbook for that specific service will then also have multiple
- versions. Playbook upkeep and task duplication under this approach can become an issue even with a relatively small 
- number of services deployed.
+1. Ansible's documentation defines patterns for idempotently creating and maintaining specified numbers of hosts on IAAS providers such as AWS and Rackspace using attributes or tags to maintain desired counts for each type of host (specifically: the pattern of running a cloud module as a 'local_action:' and then iterating with 'add_host:' to get the cloud hosts into live inventory). However the natural progression of deploying with this model is to have a playbook for each type of service that needs to be deployed in which these host tags and counts are statically written. Further, if some instances of a service are on different providers or need to run different numbers of each type of host, the playbook for that specific service instance will then itself have multiple versions. Playbook upkeep and task duplication under this approach can become an issue even with a relatively small  number of services deployed.
 
-### How does pansi help with this problem?
+  - The main goal of pansi is to document a pattern where the variables that define a service can be stored in a variables file and passed (by the playbook for the service being deployed) to a set of IAAS roles that will do the actual work with Ansible's cloud modules. Or in other words it is an abstraction designed to separate the playbooks that create and deploy the service from the variables that distinguish it from other services  of the same type. Under this approach, a service only needs one playbook to deploy and maintain all instances of  itself.
 
-With the above in mind, the goal of pansi is to document a pattern by which a service's parameters can be stored in an 
-Ansible variables file and passed (by the playbook for the service being deployed) to a set of IAAS roles 
-that will do the actual work with Ansible's cloud modules. Or in other words it is an abstraction designed to 
- separate the playbooks that create and deploy the service from the variables that distinguish it from other services 
- of the same type. Under this approach, a service only needs one playbook to deploy and maintain all instances of 
- itself.
+2. Statically writing the 'local_action:' cloud module tasks into the playbooks that deploy your services (or, slightly better, storing those tasks separately and importing them) makes it cumbersome to move services or parts of services to other providers.
+
+  - Storing the parameters that define a service's layout separately allows them to be edited more easily and much less (if any) editing be done to actual playbooks.
+
+3. Adding separate tooling (Terraform, perhaps) to your systems to solve this problem can take time and may often get blocked by more urgent tasks.
+
+  - pansi can be used as a stepping stone here because it has conceptual similarities to these "declarative infrastructure" tools and because it is more quickly understood and adopted because it consists purely of Ansible concepts and processes.
 
 ### What is the downside to this approach?
 
