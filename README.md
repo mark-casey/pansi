@@ -8,7 +8,7 @@ Ansible's documentation defines patterns for idempotently maintaining set number
 
 The main goal of pansi is to document a pattern in which the variables that define the host-layout of a service can be stored in a variables file and "passed" (by the playbook for the service being deployed) to a set of generalized IAAS roles that will do the actual work with Ansible's cloud modules. Or in other words it is an abstraction designed to separate the playbooks that create and deploy the service from the variables that distinguish it from other services of the same type. Under this approach, each service only needs one playbook to deploy and maintain all instances of itself.
 
-Adding separate infrastructure tooling (Terraform, perhaps) to your systems is another solution but can take time and may often get blocked by more immediate tasks. Pansi can be used as a stepping stone here because it has conceptual similarities to these "declarative infrastructure" tools, and because it consists purely of Ansible concepts and processes it is more quickly understood and implemented.
+Adding separate infrastructure tooling like Terraform to your systems is another solution (and in many cases a better, more full featured longterm option) but adoption can take time and may often get blocked by more immediate tasks. Pansi can be used as a stepping stone here because it has conceptual similarities to these "declarative infrastructure" tools, and because it consists purely of Ansible concepts and processes it is more quickly understood and implemented.
 
 ### Secondary issues/benefits
 
