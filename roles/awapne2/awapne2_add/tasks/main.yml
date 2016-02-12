@@ -36,7 +36,7 @@
 # CAUTION!
 # The value used for name= or hostname= in the add_hosts tasks below must either be unique (such as the public
 #   IP) or include the provider name to prevent duplicate hostnames between providers (i.e.: two qasite-webhost3
-#   nodes, in different providers). Some providers embed their name in the instance's name when creating it and
+#   hosts, in different providers). Some providers embed their name in the instance's name when creating it and
 #   this stays with the value when used as the hostname in add_host tasks, others prepend it to the hostname
 #   field in every add_host task.
 #

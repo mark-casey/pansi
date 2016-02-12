@@ -28,24 +28,30 @@ servisParams:
   # the user we will create when removing the default admin user for security
   deployUser: fabrikamdeploy
 
-  # a YAML structure that describes the nodes in this servis
-  nodes:
+  # a YAML structure that describes the hosts in this servis
+  host_data:
     - labeling_group: jenkins
       provider: awapne2
       count: 1
       roles_applied:
+        - jenkins
         - ldap
     - labeling_group: jenkins
       provider: raxord2
       count: 1
       roles_applied:
+        - jenkins
         - ldap
     - labeling_group: aptly
       provider: awapne2
       count: 1
+      roles_applied:
+        - aptly
     - labeling_group: aptly
       provider: raxord2
       count: 1
+      roles_applied:
+        - aptly
 
 
 
@@ -53,7 +59,7 @@ servisParams:
 
 #WORK-IN-PROGRESS BELOW HERE
       ##
-      ## ADDITIONAL FUTURE ATTRIBUTES OF NODES
+      ## ADDITIONAL FUTURE ATTRIBUTES OF HOSTS
       ##
       ## These are node attributes that were previously defined elsewhere or used their defaults.
       ## Either a block like this will get added directly to each defined node, or they may move

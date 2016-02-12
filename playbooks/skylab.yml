@@ -6,11 +6,11 @@
   vars_files:
     - ../group_vars/{{ servis }}
   tasks:
-    - name: Assert that there are two aptlynodes and two jenkinsnodes
+    - name: Assert that there are two hosts labeled aptly and two hosts labeled jenkins
       assert:
         that:
-          - "{{ servisParams.nodes|selectattr('labeling_group', 'equalto', 'aptly')|list|length() }} == 2"
-          - "{{ servisParams.nodes|selectattr('labeling_group', 'equalto', 'jenkins')|list|length() }} == 2"
+          - "{{ servisParams.host_data|selectattr('labeling_group', 'equalto', 'aptly')|list|length() }} == 2"
+          - "{{ servisParams.host_data|selectattr('labeling_group', 'equalto', 'jenkins')|list|length() }} == 2"
 
 
 
@@ -22,16 +22,16 @@
   tasks:
     # it would be nice to be able to copy all the node attributes directly instead of (re)hard-coding all of them
     #- debug: var=item
-    #  with_items: servisParams.nodes
+    #  with_items: servisParams.host_data
 
-    - name: Add localhost alias for each combination
+    - name: Add localhost alias for each labeling_group<->provider combination
       add_host: hostname={{ item.labeling_group }}_on_{{ item.provider }} ansible_connection=local groupname={{ item.provider }}_play_hosts_selector_group
                 type={{ item.labeling_group }} count={{ item.count }} roles_applied={{ item.roles_applied|default('') }}
-      with_items: servisParams.nodes
+      with_items: servisParams.host_data
 
 
 
-- name: Create or persist nodes in IAAS providers
+- name: Create or persist hosts in IAAS providers
   hosts: awapne2_play_hosts_selector_group
   serial: 1  # this is required, else the hosts 'register:' the cloud module result over one another
   vars_files:
@@ -42,7 +42,7 @@
 
 
 
-- name: Create or persist nodes in IAAS providers
+- name: Create or persist hosts in IAAS providers
   hosts: raxord2_play_hosts_selector_group
   serial: 1  # this is required, else the hosts 'register:' the cloud module result over one another
   vars_files:
@@ -89,13 +89,22 @@
 
 
 
-- name: Deploy jenkins node(s)
-  hosts: "{{ servis }}_jenkins:!host_provisioned_True"
+- name: Deploy LDAP
+  hosts: "{{ servis }}_ldap!host_provisioned_True"
   remote_user: "{{ deployUser }}"
   sudo: yes
 
   roles:
     - openldap_server
+
+
+
+- name: Deploy Jenkins
+  hosts: "{{ servis }}_jenkins:!host_provisioned_True"
+  remote_user: "{{ deployUser }}"
+  sudo: yes
+
+  roles:
     - ldap_auth_client
     - role: smola.java
       java_cleanup: False
@@ -106,7 +115,7 @@
 
 
 
-#- name: Deploy aptly nodes(s)
+#- name: Deploy aptly
 #  hosts: "{{ servis }}_aptly:!host_provisioned_True"
 #  remote_user: "{{ deployUser }}"
 #  sudo: yes
