@@ -1,45 +1,28 @@
 # pansi
 
-### What issue does pansi primarily target?
-
-Ansible's documentation defines patterns for idempotently maintaining set numbers of hosts on IAAS providers such as AWS and Rackspace using attributes or tags to maintain desired counts for each type of host (specifically, the pattern of running a cloud module as a 'local_action:' and then iterating with 'add_host:' to get the cloud hosts into live inventory). However, the natural progression of deploying with this model is to statically write these host tags and counts into the playbook for each type of service that needs to be deployed. Further, if some instances of a service are on different providers or need to run different numbers of each type of host, the playbook for that specific service instance will then itself have multiple versions. Playbook upkeep and task duplication under this approach can become an issue even with a relatively small number of services deployed.
-
-### How does pansi address the issue; are there other options?
-
-The main goal of pansi is to document a pattern in which the variables that define the host-layout of a service can be stored in a variables file and "passed" (by the playbook for the service being deployed) to a set of generalized IAAS roles that will do the actual work with Ansible's cloud modules. Or in other words it is an abstraction designed to separate the playbooks that create and deploy the service from the variables that distinguish it from other services of the same type. Under this approach, each service only needs one playbook to deploy and maintain all instances of itself.
-
-The distinction between pansi and maintaining static inventory is that pansi stores what types of hosts a service requires, how many there are of each type, and what service-specific variables there might be, but knows next to nothing about any individual host (thereby leaving that job to dynamic inventory scripts). This is a critical distinction for the purposes of staying on the 'cattle' side of the traditional pets v. cattle analogy.
-
-Adding separate infrastructure tooling like Terraform to your systems is another solution (and in many cases a better, more full featured longterm option) but adoption can take time and may often get blocked by more immediate tasks. Pansi can be used as a stepping stone here because it has conceptual similarities to these "declarative infrastructure" tools, and because it consists purely of Ansible concepts and processes it is more quickly understood and implemented.
-
-### Secondary issues/benefits
-
-**Moving hosts with the traditional 'add_host:' loop**  
-Statically writing the 'local_action:' cloud module tasks into the playbooks that deploy your services (or, slightly better, storing those tasks separately and importing them) makes it cumbersome to move services or parts of services to other providers.
-
-**Moving hosts with pansi**  
-Storing the parameters that define a service's layout separately allows for moving a host to another provider by changing a single variable. (Though, whether or not the entire service must be redeployed or host being relocated is simply killed prior to re-running Ansible still depends on what the service does and how it manages its state.)
-
-### What does the name mean?
-
-Deploying named instances of services onto providers is kind of PAAS-like; pansi is an assortment of 
-letters from the phrase "PAAS in Ansible" run together.
+pansi is an abstraction that combines several Ansible patterns (and perhaps an anti-pattern
+or two) to reduce "cloud playbook sprawl" and make it easier to codify into version control
+how services deployed to cloud providers are structured **without** using static host
+inventory or preventing the use of dynamic inventory scripts. Other goals are to make it
+easier to move hosts that are part of a service from one cloud provider to another, and to
+target hosts from multiple providers in a single run.
 
 ### Definitions
 
 **NOTE**: The purpose of the odd spellings is to help maintain manageability. For example,
-the term below 'servis' is merely a misspelling of 'service'. The misspelled option is
-more easily located and distinguished in codebases, which often use these common terms
-in many different contexts. Should a term ever need to be renamed or modified procedurally,
+the term 'servis' is merely a misspelling of 'service'. The misspelled option is more
+easily located and distinguished in codebases, which often use these common terms in
+many different contexts. Should a term ever need to be renamed or modified procedurally,
 the find/replace or other operation will be much easier on the human running it and there
 may be 100 instances of the misspelled term to sort through instead of (in some cases)
-thousands of unrelated instances in the case of using a generic term spelled correctly.
+thousands of unrelated instances in the case of using a generic term spelled correctly
+in a project that contains many other libraries/dependencies.
 
 **host**: An Ansible host.
 
-**servis**: A 'service', or 'deployment'. A servis is a host (or hosts working together)
-to do an assigned job such as run builds, host a package cache, store backups, host a
-database or web frontend, or etc.
+**servis**: A 'service', or 'deployment', the thing being deployed. A servis is a host (or
+hosts working together) to do an assigned job such as run builds, host a package cache,
+store backups, host a database or web frontend, or etc.
 
 **servisName**, and **servisType**: Each servis has a "servisName" and is an instance of its
  "servisType", just as a traditional named programming object is an instance of its
@@ -52,12 +35,12 @@ database or web frontend, or etc.
 **servisParams**: A data structure that stores these other parameters that define a servis,
  which takes the form of an Ansible group_vars file named for the servisName.
 
-**provider**: Hosts are provided by providers. These are Infrastructure as a Service (IAAS)
- providers such as EC2 and Rackspace. Providers' names are semi-arbitrary, as long as they
- match in the couple of places they are defined in pansi. Providers are actually a reference
+**providr**: Hosts are provided by providrs. These are Infrastructure as a Service (IAAS)
+ providers such as EC2 and Rackspace. Providrs' names are semi-arbitrary, as long as they
+ match in the couple of places they are defined in pansi. Providrs are actually a reference
  to an individual tennant/project/VPC-subnet within an IAAS provider (as opposed to the
  entire IAAS company, or everything a you host there... which would be too broad). Example
- provider names might be 'awapne2' if you had a single VPC in the Asia-Pacific
+ providr names might be 'awapne2' if you had a single VPC in the Asia-Pacific
  Northeast-2 region of AWS or 'raxord2' for the second of two Rackspace accounts that
  deploy into the ORD datacenter in Chicago.
 
@@ -91,6 +74,34 @@ group and plays for LDAP in the skylab playbook appear earlier than those for Je
 spite of 'jenkins' being those host's labeling_group.
 
 
+
+### What issue does pansi primarily target?
+
+Ansible's documentation defines patterns for idempotently maintaining set numbers of hosts on IAAS providers such as AWS and Rackspace using attributes or tags to maintain desired counts for each type of host (specifically, the pattern of running a cloud module as a 'local_action:' and then iterating with 'add_host:' to get the cloud hosts into live inventory). However, the natural progression of deploying with this model is to statically write these host tags and counts into the playbook for each type of service that needs to be deployed. Further, if some instances of a service are on different providers or need to run different numbers of each type of host, the playbook for that specific service instance will then itself have multiple versions. Playbook upkeep and task duplication under this approach can become an issue even with a relatively small number of services deployed.
+
+### How does pansi address the issue; are there other options?
+
+The main goal of pansi is to document a pattern in which the variables that define the host-layout of a service can be stored in a variables file and "passed" (by the playbook for the service being deployed) to a set of generalized IAAS roles that will do the actual work with Ansible's cloud modules. Or in other words it is an abstraction designed to separate the playbooks that create and deploy the service from the variables that distinguish it from other services of the same type. Under this approach, each service only needs one playbook to deploy and maintain all instances of itself.
+
+The distinction between pansi and maintaining static inventory is that pansi stores what types of hosts a service requires, how many there are of each type, and what service-specific variables there might be, but knows next to nothing about any individual host (thereby leaving that job to dynamic inventory scripts). This is a critical distinction for the purposes of staying on the 'cattle' side of the traditional pets v. cattle analogy.
+
+Adding separate infrastructure tooling like Terraform to your systems is another solution (and in many cases a better, more full featured longterm option) but adoption can take time and may often get blocked by more immediate tasks. Pansi can be used as a stepping stone here because it has conceptual similarities to these "declarative infrastructure" tools, and because it consists purely of Ansible concepts and processes it is more quickly understood and implemented.
+
+### Secondary issues/benefits
+
+**Moving hosts with the traditional 'add_host:' loop**  
+Statically writing the 'local_action:' cloud module tasks into the playbooks that deploy your services (or, slightly better, storing those tasks separately and importing them) makes it cumbersome to move services or parts of services to other providers.
+
+**Moving hosts with pansi**  
+Storing the parameters that define a service's layout separately allows for moving a host to another provider by changing a single variable. (Though, whether or not the entire service must be redeployed or host being relocated is simply killed prior to re-running Ansible still depends on what the service does and how it manages its state.)
+
+### What does the name mean?
+
+Deploying named instances of services onto providers is kind of PAAS-like; pansi is an assortment of 
+letters from the phrase "PAAS in Ansible" run together.
+
+
+
 ### Is there any other information about pansi that maybe hasn't been completely formatted yet that you could just sort of paste-vomit into this space for me to read?
 
 These values are important to pansi:
@@ -99,13 +110,13 @@ These values are important to pansi:
 "cloud-ops") concepts and terminology. For example pansi defines host's Ansible group memberships directly in the
  group_vars files that define the servisParams, rather than creating a "servisRole" or "servisComponentType"
  parameter for what each host's purpose is and then having to map the appropriate set of Ansible groups in a
- servisRole-to-ansibleGroup data structure. Calling them what they are right in the servisParams removes the need
- for this extra layer of indirection.
+ servisRole-to-ansibleGroup data structure. Calling them what they are right in the servisParams (the
+ "labeling_group" and the "roles_applied") removes the need for this extra layer of indirection.
 - As pansi itself will be seen by some as an anti-pattern anyway, it's reasonable to utilize some anti-patterns or
  generally odd methods of accomplishing its goals. **HOWEVER**, finding innovative ways to make pansi's operations
- work more like current established patterns is a high-priority goal.
-- The roadmap should always include discussion of options for further removing concepts, terms, and anti-patterns 
-that do not have their own application outside of pansi.
+ work more like current established Ansible patterns is a high-priority goal.
+- The roadmap (not quite yet written down!) should always include discussion of options for further removing
+concepts, terms, and anti-patterns that do not have their own application outside of pansi.
 
 This is the current model in brief (and probably with technical omissions or misstatements):
 

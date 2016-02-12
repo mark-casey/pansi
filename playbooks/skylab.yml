@@ -14,7 +14,7 @@
 
 
 
-- name: add_host an alias of localhost into live inventory for each nodeType-provider combination
+- name: add_host an alias of localhost into live inventory for each labeling_group<->providr combination
   hosts: localhost
   connection: local
   vars_files:
@@ -24,8 +24,8 @@
     #- debug: var=item
     #  with_items: servisParams.host_data
 
-    - name: Add localhost alias for each labeling_group<->provider combination
-      add_host: hostname={{ item.labeling_group }}_on_{{ item.provider }} ansible_connection=local groupname={{ item.provider }}_play_hosts_selector_group
+    - name: Add localhost alias for each labeling_group<->providr combination
+      add_host: hostname={{ item.labeling_group }}_on_{{ item.providr }} ansible_connection=local groupname={{ item.providr }}_play_hosts_selector_group
                 type={{ item.labeling_group }} count={{ item.count }} roles_applied={{ item.roles_applied|default('') }}
       with_items: servisParams.host_data
 

@@ -24,8 +24,8 @@
 #
 # CAUTION!
 # The value used for name= or hostname= in the add_hosts tasks below must either be unique (such as the public
-#   IP) or include the provider name to prevent duplicate hostnames between providers (i.e.: two qasite-webhost3
-#   hosts, in different providers). Some providers embed their name in the instance's name when creating it and
+#   IP) or include the providr name to prevent duplicate hostnames between providrs (i.e.: two qasite-webhost3
+#   hosts, in different providrs). Some providrs embed their name in the instance's name when creating it and
 #   this stays with the value when used as the hostname in add_host tasks, others prepend it to the hostname
 #   field in every add_host task.
 #
@@ -35,12 +35,12 @@
                 nodeType={{ type }}
                 private_ip={{ item.rax_addresses.private[0].addr }}
                 public_ip={{ item.rax_accessipv4 }}
-                provider="raxord2"
+                providr="raxord2"
                 instanceInitialUser={{ instanceInitialUser }}
   with_items: raxord2.instances
   when: wait == "yes"
 
-- name: Add instance(s) to group named for provider
+- name: Add instance(s) to group named for providr
   local_action: add_host hostname={{ item.rax_name }} ansible_ssh_host={{ item.rax_accessipv4 }} groupname=raxord2
   with_items: raxord2.instances
   when: wait == "yes"

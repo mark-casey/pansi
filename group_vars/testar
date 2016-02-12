@@ -31,24 +31,24 @@ servisParams:
   # a YAML structure that describes the hosts in this servis
   host_data:
     - labeling_group: jenkins
-      provider: awapne2
+      providr: awapne2
       count: 1
       roles_applied:
         - jenkins
         - ldap
     - labeling_group: jenkins
-      provider: raxord2
+      providr: raxord2
       count: 1
       roles_applied:
         - jenkins
         - ldap
     - labeling_group: aptly
-      provider: awapne2
+      providr: awapne2
       count: 1
       roles_applied:
         - aptly
     - labeling_group: aptly
-      provider: raxord2
+      providr: raxord2
       count: 1
       roles_applied:
         - aptly
