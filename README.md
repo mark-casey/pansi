@@ -1,41 +1,24 @@
 # pansi
 
-### What problem does pansi attempt to solve?
+### What issue does pansi primarily target?
 
-Ansible's documentation defines patterns for idempotently creating and maintaining specified numbers of hosts on 
-IAAS providers such as AWS and Rackspace using attributes or tags to maintain desired counts for each type
- of host (specifically: the pattern of running a cloud module as a 'local_action:' and then iterating with 
- 'add_host:' to get the cloud hosts into live inventory). However, it was "our" (the author[s]) finding that the next 
- place the admin will find themselves is with a playbook for each type of service they deploy that has these host tags
- and counts statically written in. Further, if some instances of a service are on different providers or need to 
- run different numbers of each type of host, the playbook for that specific service will then also have multiple
- versions. Playbook upkeep and task duplication under this approach can become an issue even with a relatively small 
- number of services deployed.
+Ansible's documentation defines patterns for idempotently maintaining set numbers of hosts on IAAS providers such as AWS and Rackspace using attributes or tags to maintain desired counts for each type of host (specifically, the pattern of running a cloud module as a 'local_action:' and then iterating with 'add_host:' to get the cloud hosts into live inventory). However, the natural progression of deploying with this model is to statically write these host tags and counts into the playbook for each type of service that needs to be deployed. Further, if some instances of a service are on different providers or need to run different numbers of each type of host, the playbook for that specific service instance will then itself have multiple versions. Playbook upkeep and task duplication under this approach can become an issue even with a relatively small number of services deployed.
 
-### How does pansi help with this problem?
+### How does pansi address the issue; are there other options?
 
-With the above in mind, the goal of pansi is to document a pattern by which a service's parameters can be stored in an 
-Ansible variables file and passed (by the playbook for the service being deployed) to a set of IAAS roles 
-that will do the actual work with Ansible's cloud modules. Or in other words it is an abstraction designed to 
- separate the playbooks that create and deploy the service from the variables that distinguish it from other services 
- of the same type. Under this approach, a service only needs one playbook to deploy and maintain all instances of 
- itself.
+The main goal of pansi is to document a pattern in which the variables that define the host-layout of a service can be stored in a variables file and "passed" (by the playbook for the service being deployed) to a set of generalized IAAS roles that will do the actual work with Ansible's cloud modules. Or in other words it is an abstraction designed to separate the playbooks that create and deploy the service from the variables that distinguish it from other services of the same type. Under this approach, each service only needs one playbook to deploy and maintain all instances of itself.
 
-### What is the downside to this approach?
+The distinction between pansi and maintaining static inventory is that pansi stores what types of nodes a service requires, how many there are of each type, and what service-specific variables there might be, but knows next to nothing about any individual host (thereby leaving that job to dynamic inventory scripts). This is a critical distinction for the purposes of staying on the 'cattle' side of the traditional pets v. cattle analogy.
 
-A small portion of the overhead that would have gone into maintaining a playbook for each instance of a service is 
- redirected into maintaining the variable files that hold the service parameters. However, this is still much less 
- overhead than the alternative because many tasks like moving portions of a service (or entire services) to another 
- provider become a matter of changing a few parameters instead of rewriting portions of the playbook.
- #FIXME: reinforce; find a more compelling way to demonstrate this point ^^
+Adding separate infrastructure tooling like Terraform to your systems is another solution (and in many cases a better, more full featured longterm option) but adoption can take time and may often get blocked by more immediate tasks. Pansi can be used as a stepping stone here because it has conceptual similarities to these "declarative infrastructure" tools, and because it consists purely of Ansible concepts and processes it is more quickly understood and implemented.
 
-One important point is that this overhead is **NOT** the same as the overhead one would incur by trying to maintain a 
-standard static inventory file, a custom static inventory file that generates a standard static inventory file, 
-trying to keep any static inventory file in sync with dynamic inventory scripts, or trying various other solutions. 
-The distinction lies in that pansi stores what types of nodes a service requires, how many there are of each type, 
-and what service-specific variables there might be, but knows next to nothing about any individual host (thereby 
-leaving that job to dynamic inventory scripts). This is a critical distinction for the purposes of staying on 
-the 'cattle' side of the traditional pets v. cattle analogy.
+### Secondary issues/benefits
+
+**Moving hosts with the traditional 'add_host:' loop**  
+Statically writing the 'local_action:' cloud module tasks into the playbooks that deploy your services (or, slightly better, storing those tasks separately and importing them) makes it cumbersome to move services or parts of services to other providers.
+
+**Moving hosts with pansi**  
+Storing the parameters that define a service's layout separately allows for moving a host to another provider by changing a single variable. (Though, whether or not the entire service must be redeployed or host being relocated is simply killed prior to re-running Ansible still depends on what the service does and how it manages its state.)
 
 ### What does the name mean?
 
