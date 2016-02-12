@@ -59,14 +59,14 @@
   local_action: add_host hostname={{ item[0].rax_name }} ansible_ssh_host={{ item[0].rax_accessipv4 }} groupname={{ item[1] }}
   with_nested:
     - raxord2.instances
-    - additional_groups
+    - roles_applied
   when: wait == "yes"
 
 - name: Add instance(s) to combo servis_type group, such as prod3_dbnode, or prod4_webnode
   local_action: add_host hostname={{ item[0].rax_name }} ansible_ssh_host={{ item[0].rax_accessipv4 }} groupname="{{ servis }}_{{ item[1] }}"
   with_nested:
     - raxord2.instances
-    - additional_groups
+    - roles_applied
   when: wait == "yes"
 
 - name: Wait for SSH to come up on instances
