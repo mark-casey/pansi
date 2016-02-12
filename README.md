@@ -86,23 +86,23 @@ letters from the phrase "PAAS in Ansible" run together.
  Northeast-2 region of AWS or 'raxord2' for the second of two Rackspace accounts that
  deploy into the ORD datacenter in Chicago.
 
-**typeLabel**: A node's "typeLabel" is its primary group. The fictitious servis this file
+**labelingGroup**: A node's "labelingGroup" is its primary group. The fictitious servis this file
  describes ('testar') is primarily tasked with running Jenkins, but it also hosts LDAP.
- So the typeLabel is 'jenkins', and the one "additional_group" defined is 'ldap'. Aside
+ So the labelingGroup is 'jenkins', and the one "additional_group" defined is 'ldap'. Aside
  from providing a portion of the node's name in IAAS providers, distinguishing one group
- as the typeLabel is merely intended as a convenience for us humans. (testar is an instance
+ as the labelingGroup is merely intended as a convenience for us humans. (testar is an instance
  of the fictitious servisType 'skylab', a name which could reflect the logistical/oversight
  aspects of the work it does.)
 
  The deploy order is determined by the playbook for the servisType and does not
- depend on which group is the typeLabel. The playbook deploying a skylab servis needs
+ depend on which group is the labelingGroup. The playbook deploying a skylab servis needs
  LDAP running before Jenkins can use it for auth, so the group and plays for LDAP in
  the skylab playbook are actually processed first in spite of LDAP not being those
- node's typeLabel.
+ node's labelingGroup.
 
- However, changing the typeLabel to a different group (whether to an added group or
+ However, changing the labelingGroup to a different group (whether to an added group or
  swapping it out with one of its existing additional_groups) requires redeploying the
- servis, or you'll end up with twice the intended nodes (one set with the new typeLabel,
+ servis, or you'll end up with twice the intended nodes (one set with the new labelingGroup,
  and one orphaned set set with the old one *which may still be serving requests*).
 
 ### Is there any other information about pansi that maybe hasn't been completely formatted yet that you could just sort of paste-vomit into this space for me to read?
@@ -127,7 +127,7 @@ This is the current model in brief (and probably with technical omissions or mis
 instance of a service, and any variables specific to that service.
 - The name of the service to be deployed is passed on the ansible-playbook command line (-e).
 - A localhost play imports the group_vars file using the service name passed on the command line.
-- 'add_host:' is used to create an alias of localhost for each combination of: 'IAAS_provider:typeLabel'.
+- 'add_host:' is used to create an alias of localhost for each combination of: 'IAAS_provider:labelingGroup'.
   - host vars that will be used by provider roles are passed along in the add_host task.
 - The play calls the provider role(s) once for each alias of localhost.
 

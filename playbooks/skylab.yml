@@ -9,8 +9,8 @@
     - name: Assert that there are two aptlynodes and two jenkinsnodes
       assert:
         that:
-          - "{{ servisParams.nodes|selectattr('typeLabel', 'equalto', 'aptly')|list|length() }} == 2"
-          - "{{ servisParams.nodes|selectattr('typeLabel', 'equalto', 'jenkins')|list|length() }} == 2"
+          - "{{ servisParams.nodes|selectattr('labelingGroup', 'equalto', 'aptly')|list|length() }} == 2"
+          - "{{ servisParams.nodes|selectattr('labelingGroup', 'equalto', 'jenkins')|list|length() }} == 2"
 
 
 
@@ -25,8 +25,8 @@
     #  with_items: servisParams.nodes
 
     - name: Add localhost alias for each combination
-      add_host: hostname={{ item.typeLabel }}_on_{{ item.provider }} ansible_connection=local groupname={{ item.provider }}_play_hosts_selector_group
-                type={{ item.typeLabel }} count={{ item.count }} additional_groups={{ item.additional_groups|default('') }}
+      add_host: hostname={{ item.labelingGroup }}_on_{{ item.provider }} ansible_connection=local groupname={{ item.provider }}_play_hosts_selector_group
+                type={{ item.labelingGroup }} count={{ item.count }} additional_groups={{ item.additional_groups|default('') }}
       with_items: servisParams.nodes
 
 
