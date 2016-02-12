@@ -55,6 +55,8 @@
   with_items: raxord2.instances
   when: wait == "yes"
 
+  #this and surrounding tasks need some attention (at least to their descriptions) based on changes to what
+  #   the labeling_group and roles_applied are called and how they function
 - name: Add instance(s) to group representing type of host
   local_action: add_host hostname={{ item[0].rax_name }} ansible_ssh_host={{ item[0].rax_accessipv4 }} groupname={{ item[1] }}
   with_nested:
