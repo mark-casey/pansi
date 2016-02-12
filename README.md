@@ -30,7 +30,8 @@ store backups, host a database or web frontend, or etc.
  the couple of places they are defined in pansi. A servis named 'debby' might be of the
  servisType 'apt-cache', while a servis named 'who' might be of the servisType 'bind9-deploy'.
  The fictitious included example servis 'testar' is an instance of the fictitious servisType
- 'skylab', a name which could reflect the logistical/oversight aspects of the work it does.)
+ 'skylab' which consists of some hosts that run just an aptly apt-cache and other hosts that
+ run both Jenkins and LDAP.
 
 **servisParams**: A data structure that stores these other parameters that define a servis,
  which takes the form of an Ansible group_vars file named for the servisName.
