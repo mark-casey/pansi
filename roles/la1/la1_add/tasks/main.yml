@@ -111,17 +111,6 @@
   with_items: awapne2.tagged_instances
   when: wait == "yes"
 
-  # also adds IP to known_hosts
-  # Note: Disabling StrictHostKeyChecking does NOT allow the key to change; it only adds it
-  #   when it doesn't exist. However, it could still be nice to only set the flag to disabled
-  #   when the above call to the cloud module reports a result of 'changed'.
-- name: Attempt SSH as instanceInitialUser - FAILS if user customization already done
-  shell: "ssh -o StrictHostKeyChecking=no -i ../ssh/{{ key_name }} {{ instanceInitialUser }}@{{ item.public_ip }} 'exit'"
-  with_items: awapne2.tagged_instances
-  when: wait == "yes"
-  ignore_errors: yes
-  register: ssh_attempt
-
 - name: Add instance(s) still requiring user customization to 'host_users_customized_False' group
   local_action: add_host hostname={{ item.item.public_ip }} groupname="host_users_customized_False"
   with_items: ssh_attempt.results
