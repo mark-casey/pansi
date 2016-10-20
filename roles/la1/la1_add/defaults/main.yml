@@ -1,0 +1,17 @@
+---
+
+key_name: "{{ sshKeyName }}"
+instance_type: "t2.medium"
+image: "ami-9abea4fb"
+group: "sg_default"
+roles_applied: []
+region: "ap-northeast-2"
+zone: "ap-northeast-2a"
+vpc_subnet_id: "subnet-39dksha8"
+instanceInitialUser: ubuntu
+volumes:
+  - device_name: /dev/sda1
+    device_type: gp2
+    volume_size: 250
+    delete_on_termination: true
+
