@@ -1,6 +1,28 @@
 ---
 
-  #FIXME: would like to remove the 'ec2' text from the instance and count tags later
+- name: Set fact for public IPs listed in la, which we need to enter here statically after they're created
+  set_fact: the_servars=[1.1.1.1,2.2.2.2]
+
+  # This task is much sooner in this providr, because we have to pull tags directly from the instances, not an API
+  # also adds IP to known_hosts
+  # Note: Disabling StrictHostKeyChecking does NOT allow the key to change; it only adds it
+  #   when it doesn't exist. However, it could still be nice to only set the flag to disabled
+  #   when the above call to the cloud module reports a result of 'changed'.
+- name: Attempt SSH as instanceInitialUser - FAILS if user customization already done
+  shell: "ssh -o StrictHostKeyChecking=no -i ../ssh/{{ key_name }} {{ instanceInitialUser }}@{{ item.public_ip }} 'exit'"
+  with_items: awapne2.tagged_instances
+  when: wait == "yes"
+  ignore_errors: yes
+  register: ssh_attempt
+
+
+
+
+#WIP
+
+
+
+
 - name: Set up a new host instance on EC2
   local_action:
     module: ec2
